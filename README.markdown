@@ -1,4 +1,4 @@
-# Swift Coding Style.
+# Swift Coding Style (Updated for Swift 3.0)
 
 Our overarching goals are conciseness, readability, and simplicity.
 
