@@ -329,6 +329,32 @@ When they are needed, use comments to explain **why** a particular piece of code
 
 Avoid block comments inline with code, as the code should be as self-documenting as possible. *Exception: This does not apply to those comments used to generate documentation.*
 
+**Preferred**
+```swift
+let leftMargin: CGFloat = 20
+view.frame.x = leftMargin
+```
+
+```swift
+@objc dynamic func tableView(tableView: UITableView,
+ heightForHeaderInSection section: Int) -> CGFloat {
+    // tableView ignores 0
+    return 0.01
+}
+```
+
+**Not Preferred**
+```swift
+view.frame.x = 20 // left margin
+```
+
+```swift
+@objc dynamic func tableView(tableView: UITableView,
+ heightForHeaderInSection section: Int) -> CGFloat {
+    // return small number
+    return 0.01
+}
+```
 
 ## Classes and Structures
 
