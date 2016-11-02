@@ -542,7 +542,7 @@ let value = numbers
    .map {$0 + 10}
 ```
 
-If the validity of the weak **self** in the closure is needed, bind using the variable `**self**` to shadow the original.
+If the validity of the weak **self** in the closure is needed, bind using the variable ````self```` to shadow the original.
 
 **Preferred:**
 ```swift
