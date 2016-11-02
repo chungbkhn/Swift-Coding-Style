@@ -542,6 +542,42 @@ let value = numbers
    .map {$0 + 10}
 ```
 
+If the validity of the weak **self** in the closure is needed, bind using the variable `**self**` to shadow the original.
+
+**Preferred:**
+```swift
+self.request.downloadImage(
+    url,
+    completion: { [weak self] image in
+
+        guard let `self` = self else { 
+        
+            return
+        }
+        self.didDownloadImage(image)
+        self.reloadData()
+        self.doSomethingElse()
+    }
+)
+```
+
+**Not Preferred:**
+```swift
+self.request.downloadImage(
+    url,
+    completion: { [weak self] image in
+
+        guard let strongSelf = self else { 
+        
+            return
+        }
+        strongSelf.didDownloadImage(image)
+        strongSelf.reloadData()
+        strongSelf.doSomethingElse()
+    }
+)
+```
+
 ## Types
 
 Always use Swift's native types when available. Swift offers bridging to Objective-C so you can still use the full set of methods as needed.
