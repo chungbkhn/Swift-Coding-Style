@@ -217,12 +217,16 @@ class MyViewController: UIViewController {
   // class stuff here
 }
 
+
 // MARK: - UITableViewDataSource
+
 extension MyViewController: UITableViewDataSource {
   // table view data source methods
 }
 
+
 // MARK: - UIScrollViewDelegate
+
 extension MyViewController: UIScrollViewDelegate {
   // scroll view delegate methods
 }
@@ -282,7 +286,8 @@ Keep imports minimal. For example, don't import `UIKit` when importing `Foundati
   
   ![Xcode Project settings](screens/project_settings.png)
 
-* Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
+* Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement, code in next line and close on a new line.
+* `// MARK: -` should have 2 empty lines before and one empty line after.
 * Tip: You can re-indent by selecting some code (or ⌘A to select all) and then Control-I (or Editor\Structure\Re-Indent in the menu). Some of the Xcode template code will have 4-space tabs hard coded, so this is a good way to fix that.
 
 **Preferred:**
@@ -851,6 +856,60 @@ while i < attendeeList.count {
   i += 1
 }
 ```
+
+`defer` keyword provides a safe and easy way to handle this challenge by declaring a block that will be executed only when execution leaves the current scope.
+
+**Preferred:**
+```swift
+func resizeImage(url: NSURL) -> UIImage? {
+    // ...
+    let dataSize: Int = ...
+    let destData = UnsafeMutablePointer<UInt8>.alloc(dataSize)
+    defer {
+        destData.dealloc(dataSize)
+    }
+
+    var destBuffer = vImage_Buffer(data: destData, ...)
+
+    // scale the image from sourceBuffer to destBuffer
+    var error = vImageScale_ARGB8888(&sourceBuffer, &destBuffer, ...)
+    guard error == kvImageNoError 
+        else { return nil }
+
+    // create a CGImage from the destBuffer
+    guard let destCGImage = vImageCreateCGImageFromBuffer(&destBuffer, &format, ...) 
+        else { return nil }
+    // ...
+}
+```
+
+**Not Preferred:**
+```swift
+func resizeImage(url: NSURL) -> UIImage? {
+    // ...
+    let dataSize: Int = ...
+    let destData = UnsafeMutablePointer<UInt8>.alloc(dataSize)
+    var destBuffer = vImage_Buffer(data: destData, ...)
+
+    // scale the image from sourceBuffer to destBuffer
+    var error = vImageScale_ARGB8888(&sourceBuffer, &destBuffer, ...)
+    guard error == kvImageNoError
+        else {
+            destData.dealloc(dataSize)  // 1
+            return nil
+        }
+
+    // create a CGImage from the destBuffer
+    guard let destCGImage = vImageCreateCGImageFromBuffer(&destBuffer, &format, ...) 
+        else {
+            destData.dealloc(dataSize)  // 2
+            return nil
+        }
+    destData.dealloc(dataSize)          // 3
+    // ...
+}
+```
+
 ## Golden Path
 
 When coding with conditionals, the left hand margin of the code should be the "golden" or "happy" path. That is, don't nest `if` statements. Multiple return statements are OK. The `guard` statement is built for this.
